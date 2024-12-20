@@ -10,7 +10,7 @@ import net.fabricmc.api.ModInitializer;
 import java.util.List;
 
 public class Totems implements ModInitializer {
-    public static final String MOD_ID = "Totems";
+    public static final String MOD_ID = "totems";
 
     public static final ItemSystem ITEM_SYSTEM = new ItemSystem();
     public static final BlockSystem BLOCK_SYSTEM = new BlockSystem();

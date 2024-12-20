@@ -1,13 +1,13 @@
 package de.dmt.totems.system;
 
-import de.dmt.totems.item.base.ItemBase;
 import de.dmt.totems.util.Log;
+import de.dmt.totems.wrappers.ModItem;
 
 import java.util.List;
 
 public class ItemSystem extends SystemBase {
 
-    public static final List<ItemBase> ITEMS = List.of();
+    public static final List<ModItem> ITEMS = List.of();
 
     public ItemSystem() {
         super("Items");
@@ -15,7 +15,7 @@ public class ItemSystem extends SystemBase {
 
     @Override
     protected void doInitialize() throws Exception {
-        for (ItemBase item : ITEMS) {
+        for (ModItem item : ITEMS) {
             Log.infof("Registering item: \"%s\"", item.identifier.toString());
             item.register();
         }

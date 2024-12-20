@@ -1,4 +1,4 @@
-package de.dmt.totems.block.base;
+package de.dmt.totems.wrappers;
 
 
 import de.dmt.totems.Totems;
@@ -6,34 +6,40 @@ import de.dmt.totems.util.Log;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
+import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 
 import java.util.Optional;
+import java.util.function.Function;
 
-public class BlockBase extends Block {
+public class ModBlock {
 
     public final String id;
-    public final Boolean shouldRegisterItem;
     public final RegistryKey<ItemGroup> itemGroup;
 
+    private final Function<AbstractBlock.Settings, Block> factory;
+    private final AbstractBlock.Settings settings;
+
     public final Identifier identifier;
-    private Item registeredBlockItem;
+    public final RegistryKey<Block> registryKey;
+    private Item registeredItem;
     private Block registeredBlock;
 
-    public BlockBase(String id, boolean shouldRegisterItem, RegistryKey<ItemGroup> itemGroup, AbstractBlock.Settings settings) {
-        super(settings);
-        Log.info("TEST");
+    public ModBlock(String id, RegistryKey<ItemGroup> itemGroup, Function<AbstractBlock.Settings, Block> factory, AbstractBlock.Settings settings) {
         this.id = id;
-        this.shouldRegisterItem = shouldRegisterItem;
         this.itemGroup = itemGroup;
 
+        this.factory = factory;
+        this.settings = settings;
+
         this.identifier = Identifier.of(Totems.MOD_ID, id);
+        this.registryKey = RegistryKey.of(RegistryKeys.BLOCK, identifier);
+        this.registeredItem = null;
         this.registeredBlock = null;
     }
 
@@ -43,29 +49,23 @@ public class BlockBase extends Block {
             return;
         }
 
-        if (shouldRegisterItem) {
-            BlockItem blockItem = new BlockItem(this, new Item.Settings());
-            this.registeredBlockItem = Registry.register(Registries.ITEM, identifier, blockItem);
-        }
-
-        this.registeredBlock = Registry.register(Registries.BLOCK, identifier, this);
+        this.registeredBlock = Blocks.register(registryKey, factory, settings);
+        this.registeredItem = Items.register(registeredBlock);
         registerEvents();
     }
 
     private void registerEvents() {
         if(registeredBlock == null) {
-            Log.warnf("Tried to register Events for block \"%s\" before registering the block itself. Ignoring...", identifier.toString());
+            Log.warnf("Tried to register events for block \"%s\" before registering the block itself. Ignoring...", identifier.toString());
             return;
         }
 
-        if (shouldRegisterItem) {
-            ItemGroupEvents.modifyEntriesEvent(itemGroup).register((itemGroup) -> itemGroup.add(registeredBlockItem));
-        }
         ItemGroupEvents.modifyEntriesEvent(itemGroup).register((itemGroup) -> itemGroup.add(registeredBlock));
+        ItemGroupEvents.modifyEntriesEvent(itemGroup).register((itemGroup) -> itemGroup.add(registeredItem));
     }
 
-    public Optional<Item> getRegisteredBlockItem() {
-        return Optional.ofNullable(registeredBlockItem);
+    public Optional<Item> getRegisteredItem() {
+        return Optional.ofNullable(registeredItem);
     }
 
     public Optional<Block> getRegisteredBlock() {
