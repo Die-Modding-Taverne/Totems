@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "totems",
+  "version": "${version}",
+  "name": "Totems",
+  "description": "Adds multiple Totems to your game",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/totems/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "de.dmt.totems.client.TotemsClient"
+    ],
+    "main": [
+      "de.dmt.totems.Totems"
+    ]
+  },
+  "mixins": [
+    "totems.mixins.json",
+    {
+      "config": "totems.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
